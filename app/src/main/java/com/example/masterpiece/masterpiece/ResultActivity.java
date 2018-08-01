@@ -5,11 +5,14 @@ import android.content.ContextWrapper;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
+import android.graphics.Point;
 import android.net.Uri;
 import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Display;
 import android.view.View;
 import android.widget.ImageView;
 
@@ -25,6 +28,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Calendar;
 
 public class ResultActivity extends AppCompatActivity {
     public RequestQueue queue;
@@ -40,82 +44,8 @@ public class ResultActivity extends AppCompatActivity {
         image = intent.getParcelableExtra("image");
         final ImageView imageView = findViewById(R.id.imageView);
         imageView.setImageBitmap(image);
-        image_name = "k";
+        image_name = Calendar.getInstance().getTime().toString();
         setResultImage();
-
-//        RequestQueue requestQueue = Volley.newRequestQueue(getApplicationContext());
-//
-//        // Initialize a new ImageRequest
-//        ImageRequest imageRequest = new ImageRequest(
-//                "http://143.248.38.75:8080/output", // Image URL
-//                new Response.Listener<Bitmap>() { // Bitmap listener
-//                    @Override
-//                    public void onResponse(Bitmap response) {
-//                        // Do something with response
-//                        imageView.setImageBitmap(response);
-//
-//                        // Save this downloaded bitmap to internal storage
-//                        Uri uri = saveImageToInternalStorage(response);
-//
-//                        // Display the internal storage saved image to image view
-//                        imageView.setImageURI(uri);
-//                    }
-//                },
-//                400, // Image width
-//                400, // Image height
-//                ImageView.ScaleType.CENTER_CROP, // Image scale type
-//                Bitmap.Config.RGB_565, //Image decode configuration
-//                new Response.ErrorListener() { // Error listener
-//                    @Override
-//                    public void onErrorResponse(VolleyError error) {
-//                        // Do something with error response
-//                        error.printStackTrace();
-//                    }
-//                }
-//        );
-//
-//        // Add ImageRequest to the RequestQueue
-//        requestQueue.add(imageRequest);
-//    }
-//
-//    // Custom method to save a bitmap into internal storage
-//    protected Uri saveImageToInternalStorage(Bitmap bitmap){
-//        // Initialize ContextWrapper
-//        ContextWrapper wrapper = new ContextWrapper(getApplicationContext());
-//
-//        // Initializing a new file
-//        // The bellow line return a directory in internal storage
-//        File file = wrapper.getDir("Images",MODE_PRIVATE);
-//
-//        // Create a file to save the image
-//        file = new File(file, "UniqueFileName"+".jpg");
-//
-//        try{
-//            // Initialize a new OutputStream
-//            OutputStream stream = null;
-//
-//            // If the output file exists, it can be replaced or appended to it
-//            stream = new FileOutputStream(file);
-//
-//            // Compress the bitmap
-//            bitmap.compress(Bitmap.CompressFormat.JPEG,100,stream);
-//
-//            // Flushes the stream
-//            stream.flush();
-//
-//            // Closes the stream
-//            stream.close();
-//
-//        }catch (IOException e) // Catch the exception
-//        {
-//            e.printStackTrace();
-//        }
-//
-//        // Parse the gallery image url to uri
-//        Uri savedImageURI = Uri.parse(file.getAbsolutePath());
-//
-//        // Return the saved image Uri
-//        return savedImageURI;
     }
 
     public void setResultImage() {
@@ -127,7 +57,8 @@ public class ResultActivity extends AppCompatActivity {
                         try {
                             if (response != null) {
                                 Log.d("ResponseLog", response.toString());
-                                ((ImageView) findViewById(R.id.imageView)).setImageBitmap(BitmapFactory.decodeByteArray(response, 0, response.length));
+                                image = BitmapFactory.decodeByteArray(response, 0, response.length);
+                                setImage(image);
                             }
                         } catch (Exception e) {
                             // TODO Auto-generated catch block
@@ -145,11 +76,48 @@ public class ResultActivity extends AppCompatActivity {
         }, null);
         queue.add(request);
     }
+    public void setImage(Bitmap bitmap){
+        ImageView imageView = (ImageView) findViewById(R.id.imageView);
+        imageView.setImageBitmap(bitmap);
 
+        View button = findViewById(R.id.button);
+        Display display = getWindowManager().getDefaultDisplay();
+        Point size = new Point();
+        display.getSize(size);
+        int width = size.x - 40;
+        int height = size.y - 20 -button.getHeight();
+
+        if((width*1.0/height) > (bitmap.getWidth()*1.0/bitmap.getHeight())){
+            bitmap = getResizedBitmap(bitmap,
+                                        height,
+                                        (int)(height * (bitmap.getWidth()*1.0/bitmap.getHeight())));
+            imageView.setImageBitmap(bitmap);
+        }
+        else{
+            bitmap = getResizedBitmap(bitmap,
+                        (int)(width * (bitmap.getHeight()*1.0/bitmap.getWidth())),
+                        width);
+            imageView.setImageBitmap(bitmap);
+        }
+    }
+    public static Bitmap getResizedBitmap(Bitmap bm, int newHeight, int newWidth) {
+        int width = bm.getWidth();
+        int height = bm.getHeight();
+        float scaleWidth = ((float) newWidth) / width;
+        float scaleHeight = ((float) newHeight) / height;
+        // CREATE A MATRIX FOR THE MANIPULATION
+        Matrix matrix = new Matrix();
+        // RESIZE THE BIT MAP
+        matrix.postScale(scaleWidth, scaleHeight);
+        // RECREATE THE NEW BITMAP
+        Bitmap resizedBitmap = Bitmap.createBitmap(bm, 0, 0, width, height,
+                matrix, false);
+        return resizedBitmap;
+    }
     public void saveImage(View view) {
         ContextWrapper cw = new ContextWrapper(getApplicationContext());
         // path to /data/data/yourapp/app_data/imageDir
-        File directory = cw.getDir("imageDir", Context.MODE_PRIVATE);
+        File directory = cw.getDir("imageㄴ", Context.MODE_PRIVATE);
         // Create imageDir
         File mypath = new File(directory, image_name + ".jpg");
 
