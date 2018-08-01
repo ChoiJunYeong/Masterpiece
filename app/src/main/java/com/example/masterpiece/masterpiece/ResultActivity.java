@@ -95,7 +95,8 @@ public class ResultActivity extends AppCompatActivity {
         }, null);
         queue.add(request);
     }
-    public void setImage(Bitmap bitmap){
+
+    public void setImage(Bitmap bitmap) {
         ImageView imageView = (ImageView) findViewById(R.id.imageView);
         imageView.setImageBitmap(bitmap);
 
@@ -104,21 +105,21 @@ public class ResultActivity extends AppCompatActivity {
         Point size = new Point();
         display.getSize(size);
         int width = size.x - 40;
-        int height = size.y - 20 -button.getHeight();
+        int height = size.y - 20 - button.getHeight();
 
-        if((width*1.0/height) > (bitmap.getWidth()*1.0/bitmap.getHeight())){
+        if ((width * 1.0 / height) > (bitmap.getWidth() * 1.0 / bitmap.getHeight())) {
             bitmap = getResizedBitmap(bitmap,
-                                        height,
-                                        (int)(height * (bitmap.getWidth()*1.0/bitmap.getHeight())));
+                    height,
+                    (int) (height * (bitmap.getWidth() * 1.0 / bitmap.getHeight())));
             imageView.setImageBitmap(bitmap);
-        }
-        else{
+        } else {
             bitmap = getResizedBitmap(bitmap,
-                        (int)(width * (bitmap.getHeight()*1.0/bitmap.getWidth())),
-                        width);
+                    (int) (width * (bitmap.getHeight() * 1.0 / bitmap.getWidth())),
+                    width);
             imageView.setImageBitmap(bitmap);
         }
     }
+
     public static Bitmap getResizedBitmap(Bitmap bm, int newHeight, int newWidth) {
         int width = bm.getWidth();
         int height = bm.getHeight();
@@ -133,6 +134,7 @@ public class ResultActivity extends AppCompatActivity {
                 matrix, false);
         return resizedBitmap;
     }
+
     public void saveImage(View view) {
         ContextWrapper cw = new ContextWrapper(getApplicationContext());
         // path to /data/data/yourapp/app_data/imageDir
