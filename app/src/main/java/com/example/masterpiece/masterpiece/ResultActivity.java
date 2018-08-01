@@ -51,8 +51,6 @@ public class ResultActivity extends AppCompatActivity {
         setResultImage();
 
 
-
-
     }
 
     public void setResultImage() {
@@ -140,8 +138,8 @@ public class ResultActivity extends AppCompatActivity {
 
     public void saveImage(View view) {
         File root = Environment.getExternalStorageDirectory();
-        File cachePath = new File(root.getAbsolutePath() + "/DCIM/Camera/"+image_name+".jpg");
-        if(!cachePath.mkdirs())
+        File cachePath = new File(root.getAbsolutePath() + "/DCIM/Camera/" + image_name + ".jpg");
+        if (!cachePath.mkdirs())
             cachePath.mkdir();
 
         // Create imageDir
@@ -153,13 +151,13 @@ public class ResultActivity extends AppCompatActivity {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        Toast.makeText(this,"save",Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "save", Toast.LENGTH_SHORT).show();
     }
 
     public void shareImage(View view) {
         Bitmap bitmap = image;
         File root = Environment.getExternalStorageDirectory();
-        File cachePath = new File(root.getAbsolutePath() + "/DCIM/Camera/"+image_name+".jpg");
+        File cachePath = new File(root.getAbsolutePath() + "/DCIM/Camera/" + image_name + ".jpg");
         try {
             cachePath.createNewFile();
             FileOutputStream ostream = new FileOutputStream(cachePath);
@@ -173,6 +171,6 @@ public class ResultActivity extends AppCompatActivity {
         share.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
         share.setDataAndType(photoURI, "image/*");
         share.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        startActivity(Intent.createChooser(share,"Share via"));
+        startActivity(Intent.createChooser(share, "Share via"));
     }
 }
